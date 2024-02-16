@@ -66,14 +66,19 @@ class TareaController {
         }
 
         public function modificarTarea() {
-            $idTarea = $_REQUEST["idTarea"];
-            $titulo = $_REQUEST["titulo"];
-            $descripcion= $_REQUEST["descripcion"];
+            if ($_SESSION['logueado']){
+                $idTarea = $_REQUEST["idTarea"];
+                $titulo = $_REQUEST["titulo"];
+                $descripcion= $_REQUEST["descripcion"];
 
-            $result = $this->tarea->modificacionTarea($idTarea, $titulo, $descripcion);
+                $result = $this->tarea->modificacionTarea($idTarea, $titulo, $descripcion);
 
-            $data["listaTareas"] = $this->tarea->getTareasPorUsuario($this->usuario->getIdUsuario($_SESSION['usuario']));
-            View::render("tarea/all", $data);
+                $data["listaTareas"] = $this->tarea->getTareasPorUsuario($this->usuario->getIdUsuario($_SESSION['usuario']));
+                View::render("tarea/all", $data);
+            }
+            else {
+                $this->loginView();
+            }
         }
 
         public function loginView(){
@@ -90,6 +95,7 @@ class TareaController {
             if($buscaUsuario){
             $_SESSION['usuario']=$usuario;
             $_SESSION['idUsuario']= $this->usuario->getIdUsuario($usuario);
+            $_SESSION['loguedo']= true;
             $this->mostrarListaTareas();
             } else {
             echo "No has introducido las credenciales correctamente";

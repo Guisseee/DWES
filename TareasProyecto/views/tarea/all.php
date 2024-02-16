@@ -3,9 +3,6 @@
 $listaTarea = $data["listaTareas"];
 
 echo "<form action='index.php'>
-        <input type='hidden' name='action' value='buscarLibros'>
-        <input type='text' name='textoBusqueda'>
-        <input type='submit' value='Buscar'>
       </form><br>";
 
 if (count($listaTarea) == 0) {
