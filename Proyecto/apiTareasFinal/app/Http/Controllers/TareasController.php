@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Tareas;
+use App\Models\Tarea;
+use App\Http\Resources\TareaResource;
+use App\Http\Requests\TareaRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\TareasResource;
-use Illuminate\Database\Eloquent\Casts\Json;
+
 
 class TareasController extends Controller
 {
@@ -15,61 +16,58 @@ class TareasController extends Controller
      */
     public function index():JsonResource
     {
-        $productos= Tareas::all();
-        // return response()->json($tareas, 200);
-        return TareasResource::collection($tareas);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        $tareas= Tarea::all();
+        return TareaResource::collection($tareas);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(TareaRequest $request)
     {
-        $categorias= $request->categorias;
-        $params= $request->all();
-        unset($params['categorias']);
-        $producto= Producto:: create($params);
-        $producto->categoria()->attach($categorias);
-        return response()->json($producto, 201);
+        $tarea= new Tarea();
+        $tarea->titulo=$request->titulo;
+        $tarea->descripcion=$request->descripcion;
+
+        $tarea->save();
+        $etiquetas= $request->etiquetas;
+        $idTarea=$tarea->id;
+        $tarea->etiquetas()->attach($etiquetas, ['tareas_id' => $idTarea]);
+        return new TareaResource($tarea);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Tareas $tareas)
+    public function show($idTarea)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Tareas $tareas)
-    {
-        //
+        $tarea= Tarea::find($idTarea);
+        return new TareaResource($tarea);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Tareas $tareas)
+    public function update(TareaRequest $request, $idTarea)
     {
-        //
+        $tarea= Tarea::find($idTarea);
+        $tarea->titulo=$request->titulo;
+        $tarea->descripcion=$request->descripcion;
+        $tarea->etiquetas()->detach();
+        $tarea->etiquetas()->attach($request->etiquetas, ['tareas_id' => $idTarea]);
+        $tarea->save();
+
+        return new TareaResource($tarea);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Tareas $tareas)
+    public function destroy($idTarea)
     {
-        //
+        $tarea= Tarea::find($idTarea);
+        $tarea->etiquetas()->detach();
+        $tarea->delete();
+        return new TareaResource($tarea);
     }
 }

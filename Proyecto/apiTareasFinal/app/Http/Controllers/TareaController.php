@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\EtiquetaResource;
+use App\Http\Requests\EtiquetaRequest;
+use App\Models\Etiqueta;
 use App\Models\Tarea;
 use Illuminate\Http\Request;
 
@@ -12,54 +15,55 @@ class TareaController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        $etiquetas= Etiqueta::all();
+        return EtiquetaResource::collection($etiquetas);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(EtiquetaRequest $request)
     {
-        //
+        $etiqueta= new Etiqueta();
+        $etiqueta->nombre=$request->nombre;
+
+        $etiqueta->save();
+
+        $tareas= $request->tareas;
+        $idEtiqueta=$etiqueta->id;
+        $etiqueta->tareas()->attach($tareas, ['etiquetas_id' => $idEtiqueta]);
+        return new EtiquetaResource($etiqueta);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Tarea $tarea)
+    public function show($idEtiqueta)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Tarea $tarea)
-    {
-        //
+        $etiqueta= Etiqueta::find($idEtiqueta);
+        return new EtiquetaResource($etiqueta);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Tarea $tarea)
+    public function update(EtiquetaRequest $request, $idEtiqueta)
     {
-        //
+        $etiqueta= Etiqueta::find($idEtiqueta);
+        $etiqueta->nombre=$request->nombre;
+
+        $etiqueta->tareas()->attach($request->tareas);
+        $etiqueta->save();
+        return new EtiquetaResource($etiqueta);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Tarea $tarea)
+    public function destroy($idEtiqueta)
     {
-        //
+        $etiqueta= Etiqueta::find($idEtiqueta);
+        $etiqueta->delete();
+        return new EtiquetaResource($etiqueta);
     }
 }
