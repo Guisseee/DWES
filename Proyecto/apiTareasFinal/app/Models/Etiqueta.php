@@ -14,6 +14,6 @@ class Etiqueta extends Model
     protected $hidden = ["created_at", "updated_at"];
 
     public function tareas(): BelongsToMany{
-        return $this->belongsToMany(Tarea::class, "tareas_etiqueta", "etiqueta_id", "tarea_id"  );
+        return $this->belongsToMany(Tarea::class, "tareas_etiquetas", "etiquetas_id", "tareas_id"  );
     }
 }

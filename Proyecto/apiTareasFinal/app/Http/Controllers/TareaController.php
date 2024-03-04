@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\EtiquetaResource;
-use App\Http\Requests\EtiquetaRequest;
-use App\Models\Etiqueta;
+use App\Http\Resources\TareaResource;
+use App\Http\Requests\TareaRequest;
 use App\Models\Tarea;
 use Illuminate\Http\Request;
 
@@ -15,55 +14,58 @@ class TareaController extends Controller
      */
     public function index()
     {
-        $etiquetas= Etiqueta::all();
-        return EtiquetaResource::collection($etiquetas);
+        $Tareas= Tarea::all();
+        return TareaResource::collection($Tareas);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(EtiquetaRequest $request)
+    public function store(TareaRequest $request)
     {
-        $etiqueta= new Etiqueta();
-        $etiqueta->nombre=$request->nombre;
+        $Tarea= new Tarea();
+        $Tarea->titulo=$request->titulo;
+        $Tarea->descripcion=$request->descripcion;
 
-        $etiqueta->save();
+
+        $Tarea->save();
 
         $tareas= $request->tareas;
-        $idEtiqueta=$etiqueta->id;
-        $etiqueta->tareas()->attach($tareas, ['etiquetas_id' => $idEtiqueta]);
-        return new EtiquetaResource($etiqueta);
+        $idTarea=$Tarea->id;
+        $Tarea->etiquetas()->attach($tareas, ['Tareas_id' => $idTarea]);
+        return new TareaResource($Tarea);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show($idEtiqueta)
+    public function show($idTarea)
     {
-        $etiqueta= Etiqueta::find($idEtiqueta);
-        return new EtiquetaResource($etiqueta);
+        $Tarea= Tarea::find($idTarea);
+        return new TareaResource($Tarea);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(EtiquetaRequest $request, $idEtiqueta)
+    public function update(TareaRequest $request, $idTarea)
     {
-        $etiqueta= Etiqueta::find($idEtiqueta);
-        $etiqueta->nombre=$request->nombre;
+        $Tarea= Tarea::find($idTarea);
+        $Tarea->titulo=$request->titulo;
+        $Tarea->descripcion=$request->descripcion;
 
-        $etiqueta->tareas()->attach($request->tareas);
-        $etiqueta->save();
-        return new EtiquetaResource($etiqueta);
+        $Tarea->etiquetas()->attach($request->tareas);
+        $Tarea->save();
+        return new TareaResource($Tarea);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($idEtiqueta)
+    public function destroy($idTarea)
     {
-        $etiqueta= Etiqueta::find($idEtiqueta);
-        $etiqueta->delete();
-        return new EtiquetaResource($etiqueta);
+        $Tarea= Tarea::find($idTarea);
+        $Tarea->delete();
+        return new TareaResource($Tarea);
     }
 }
